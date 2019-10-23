@@ -1,0 +1,2 @@
+# CesiumHeatmap
+修改了CesiumHeatmap的源码,提供修改bounds和缩放修改热力图效果
