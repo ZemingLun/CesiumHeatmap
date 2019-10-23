@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>动态热力图</title>
+    <script type="text/javascript" src="../js/Cesium/Cesium.js"></script>
+    <script type="text/javascript" src="../js/Cesium/viewerCesiumNavigationMixin.js"></script>
+    <script type="text/javascript" src="../js/Cesium/CesiumHeatmap.js"></script>
+    <link rel="stylesheet" href="../js/Cesium/Widgets/widgets.css">
+
+    <style>
+    html, body {
+      display: block;
+      margin: 0;
+      height: 100%;
+    }
+
+    #cesiumContainer {
+      height: 100%;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="cesium-logo"></div>
+    <div id="cesiumContainer"></div>
+
+    <script>
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+      navigationHelpButton: false,
+      timeline: false,
+      animation: false,
+      fullscreenButton: false,
+      geocoder: false,
+      // sceneMode: Cesium.SceneMode.COLUMBUS_VIEW,
+      creditContainer: 'cesium-logo'
+    })
+
+    viewer.extend(Cesium.viewerCesiumNavigationMixin, {})
+
+    // 矩形坐标
+    var bounds = {
+      west: -109.0, south: 30.0, east: -80.0, north: 50.0
+    }
+
+    // 初始化CesiumHeatmap
+    var heatMap = CesiumHeatmap.create(
+      viewer, // 视图层
+      bounds, // 矩形坐标
+      { // heatmap相应参数
+        maxOpacity: .5,
+        minOpacity: 0,
+        blur: .75
+      }
+    )
+
+    var sourceData = getData(300)
+    console.log(sourceData, 'sourceData')
+
+    // 添加数据 最小值，最大值，数据集
+    heatMap.setWGS84Data(0, 100, sourceData)
+    viewer.zoomTo(viewer.entities)
+
+    // 动态数据 [{x: -97.6433525165054, y: 45.61443064377248, value: 11.409122369106317}]
+    function getData(length) {
+      var data = []
+      for (var i = 0; i < length; i++) {
+        var x = Math.random() * (-109 + 80) - 80
+        var y = Math.random() * (50 - 30) + 30
+        var value = Math.random() * 100
+        data.push({ x: x, y: y, value: value, radius: 200 })
+      }
+      return data
+    }
+
+    // 鼠标滚轮事件
+    var camera = viewer.camera
+    var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas)
+    handler.setInputAction(function(wheelment) {
+      var height = camera.positionCartographic.height
+      sourceData.forEach(function(v) {
+        v.radius = height/20000
+      })
+      heatMap.setWGS84Data(0, 100, sourceData)
+    }, Cesium.ScreenSpaceEventType.WHEEL)
+
+    </script>
+  </body>
+</html>
