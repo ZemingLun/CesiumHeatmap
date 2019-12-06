@@ -11,16 +11,15 @@
 ## 修改半径
 通过事件修改传入数据半径,重新设置数据
 ```bash
- // 鼠标滚轮事件
-    var camera = viewer.camera
-    var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas)
-    handler.setInputAction(function(wheelment) {
-      var height = camera.positionCartographic.height
-      sourceData.forEach(function(v) {
-        v.radius = height/20000
-      })
-      heatMap.setWGS84Data(0, 100, sourceData)
-    }, Cesium.ScreenSpaceEventType.WHEEL)
+// 镜头移动事件
+var camera = viewer.camera
+    viewer.scene.camera.moveEnd.addEventListener(function(){
+        var height = camera.positionCartographic.height
+        sourceData.forEach(function(v) {
+          v.radius = height/20000
+        })
+        heatMap.setWGS84Data(0, 100, sourceData)
+    })
 ```
 
 ## 修改区域
